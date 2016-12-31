@@ -30,20 +30,18 @@ public class AutoForceSeedPlugin implements Plugin, DownloadCompletionListener {
   private void createConfigModule(PluginInterface pluginInterface) {
     final BasicPluginConfigModel configModel = pluginInterface.getUIManager()
         .createBasicPluginConfigModel("autoforceseed");
-    configModel.addLabelParameter2("config.title");
-    categoriesEdit = configModel.addStringParameter2("categoriesEdit", "config.categories", "");
+    configModel.addLabelParameter2("autoforceseed.title");
+    categoriesEdit = configModel.addStringParameter2("categoriesEdit", "autoforceseed.categories", "");
   }
 
   @Override
   public void onCompletion(Download download) {
-    final String value = categoriesEdit.getValue().trim();
-    if (value.isEmpty()) {
+    final String category = download.getAttribute(categoryAttribute);
+    if (category == null) {
       return;
     }
-    final String[] categories = value.split(",");
-    final String category = download.getAttribute(categoryAttribute);
-    for (String c : categories) {
-      if (c.trim().equals(category)) {
+    for (String pattern : categoriesEdit.getValue().split(",")) {
+      if (category.matches(pattern.trim())) {
         download.setForceStart(true);
         break;
       }
